@@ -1,0 +1,13 @@
+{
+    "mode": "global",
+    "peak_bin": 220,
+    "zero_bin": 247,
+    "direction": "up",
+    "embedded_bits": 544,
+    "total_bits_with_header": 576,
+    "pixels_shifted": 2741,
+    "image_shape": [
+        512,
+        512
+    ]
+}

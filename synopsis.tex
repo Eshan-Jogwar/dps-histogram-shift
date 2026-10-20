@@ -1,0 +1,95 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[top=0.6in, bottom=0.6in, left=0.65in, right=0.65in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{titlesec}
+\usepackage{enumitem}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black
+}
+
+% Tight spacing for 1-page fit
+\titleformat{\section}{\bfseries\color{blue!85!black}}{\thesection.}{0.4em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{5pt}{2pt}
+\titleformat{\subsection}{\small\bfseries\color{black!85}}{\thesubsection.}{0.3em}{}
+\titlespacing*{\subsection}{0pt}{3pt}{1pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2.5pt}
+
+\begin{document}
+\pagestyle{empty}
+
+% --- Header Block ---
+\begin{center}
+    {\large \textbf{PROJECT SYNOPSIS}}\\[0.2em]
+    {\large \textbf{Implementation of Reversible Data Hiding in Images Using Histogram Shifting}}\\[0.3em]
+    \rule{\textwidth}{0.8pt}\\[0.3em]
+    \footnotesize
+    \begin{tabularx}{\textwidth}{Xr}
+        \textbf{Course / Degree:} B.Tech (3rd Year, Sem VI) \quad \textbar \quad \textbf{Domain:} Image Processing & \textbf{Project Type:} Implementation \\
+        \multicolumn{2}{@{}l}{\textbf{Team Members:} Eshan Jogwar (BT24CSD012), Tushar Sign (BT24CSD001), Rudravignesh (BT24CSD019)} \\
+    \end{tabularx}
+    \rule{\textwidth}{0.8pt}
+\end{center}
+
+\vspace{-0.4em}
+
+\section{Project Overview}
+The objective of this project is to implement a software tool in Python for \textbf{Reversible Data Hiding (RDH)} using the \textbf{Histogram Shifting} technique. 
+
+In standard steganography (such as LSB substitution), embedding a secret message permanently alters the pixels of the host image. However, in sensitive applications like medical scans (X-rays, MRIs) and legal evidence, permanent modification of pixel values is unacceptable. Reversible data hiding solves this practical problem: it allows secret text (such as patient IDs or diagnostic notes) to be embedded directly into an image, and after extraction at the receiving end, the original host image is \textbf{completely restored bit-for-bit} with zero permanent distortion ($\text{MSE} = 0$).
+
+\section{Base Paper Reference}
+This project implements the method described in the following published literature:
+\begin{itemize}[leftmargin=1.2em, itemsep=1pt, topsep=1pt, parsep=0pt]
+    \footnotesize
+    \item \textbf{Reference Paper:} S.~K. Khudhair, M.~Sahu, R.~K.~R., and A.~K. Sahu, ``Secure Reversible Data Hiding Using Block-Wise Histogram Shifting,'' \textit{MDPI Electronics}, vol.~12, no.~5, art.~1222, March 2023.
+    \item \textbf{Foundational Algorithm:} Z.~Ni, Y.-Q. Shi, N.~Ansari, and W.~Su, ``Reversible Data Hiding,'' \textit{IEEE Transactions on Circuits and Systems for Video Technology}, vol.~16, no.~3, 2006.
+\end{itemize}
+
+\section{Algorithm \& Working Principle}
+The implementation divides the image into localized blocks (e.g., $8 \times 8$ or $16 \times 16$) to exploit local pixel correlation, following the standard four-step procedure:
+\begin{enumerate}[leftmargin=1.4em, itemsep=1.5pt, topsep=1pt, parsep=0pt]
+    \item \textbf{Histogram Calculation:} Read the grayscale image and compute the local histogram for each block to identify the \textbf{peak pixel value} $P$ (most frequent value) and the \textbf{zero/minimum value} $Z$.
+    \item \textbf{Histogram Shifting:} Assuming $P < Z$, all pixel values strictly between $P$ and $Z$ are shifted by $+1$ ($I'(x,y) = I(x,y) + 1$), opening up an empty bin immediately adjacent to $P$.
+    \item \textbf{Data Embedding:} Iterate over the image pixels. When a pixel with value $P$ is encountered, embed a secret bit $b \in \{0, 1\}$: if $b = 1$, the pixel value becomes $P+1$; if $b = 0$, it remains $P$.
+    \item \textbf{Extraction \& Image Restoration:} The receiver inspects pixels with values $P$ and $P+1$ to extract the binary message. Then, pixels in the range $(P, Z]$ are shifted backwards by $-1$, returning every pixel to its exact original value.
+\end{enumerate}
+
+\section{Software Modules to be Implemented}
+The software application will be organized into five modular components:
+\begin{itemize}[leftmargin=1.2em, itemsep=1.5pt, topsep=1pt, parsep=0pt]
+    \item \textbf{Module 1 (Payload Encoder):} Converts input text into a bitstream, with an optional password-based XOR scrambling key for basic payload privacy.
+    \item \textbf{Module 2 (Image Preprocessing \& Blocking):} Loads grayscale images (PNG/BMP/TIFF) and segments them into configurable $N \times N$ spatial blocks using NumPy.
+    \item \textbf{Module 3 (Embedding \& Extraction Engine):} Executes the block-wise histogram shifting and reversible extraction routines.
+    \item \textbf{Module 4 (Verification \& Quality Metrics):} Automatically computes Peak Signal-to-Noise Ratio ($\text{PSNR}$), Structural Similarity ($\text{SSIM}$), and Mean Squared Error ($\text{MSE}$) between the original and restored image to verify 100\% lossless recovery ($\text{MSE} = 0$).
+    \item \textbf{Module 5 (User Interface):} A lightweight interactive web dashboard (built with Streamlit) where a user can upload an image, type a secret note, download the stego image, and test one-click extraction and recovery.
+\end{itemize}
+
+\section{Tools \& Technologies}
+\begin{itemize}[leftmargin=1.2em, itemsep=1pt, topsep=1pt, parsep=0pt]
+    \footnotesize
+    \item \textbf{Programming Language:} Python 3.14 (Virtual Environment \texttt{.venv})
+    \item \textbf{Core Libraries:} \texttt{NumPy} (matrix operations and histogram calculation), \texttt{OpenCV} / \texttt{Pillow} (image I/O)
+    \item \textbf{Visualization \& UI:} \texttt{Matplotlib} (histogram distribution plots), \texttt{Streamlit} (web-based GUI)
+\end{itemize}
+
+\section{Expected Project Deliverables}
+\begin{enumerate}[leftmargin=1.4em, itemsep=1pt, topsep=1pt, parsep=0pt]
+    \item A complete, working Python implementation of block-wise histogram shifting data hiding.
+    \item Test script demonstrating that the recovered image is 100\% identical to the original image ($\text{MSE} = 0$).
+    \item A user-friendly web interface for live project demonstration during lab/viva evaluation.
+\end{enumerate}
+
+\end{document}

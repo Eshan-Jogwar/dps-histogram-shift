@@ -1,0 +1,10 @@
+# Core Dependencies for Reversible Data Hiding (RDH) Project
+numpy>=1.24.0
+pillow>=9.0.0
+matplotlib>=3.7.0
+cryptography>=41.0.0
+
+# Optional / Document Generation Tools (used for Synopsis)
+python-docx>=1.0.0
+reportlab>=4.0.0
+markdown>=3.5.0

@@ -1,0 +1,40 @@
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+*.tmp
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# LaTeX Auxiliary Build Files (keep .tex and final .pdf)
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+
+# Temporary Deb extracts (if any)
+/tmp/tk_deb/
+tectonic*.tar.gz
