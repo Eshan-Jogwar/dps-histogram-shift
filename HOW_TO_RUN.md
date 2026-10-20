@@ -60,14 +60,14 @@ python implementation/generate_samples.py
    ```bash
    python run_gui.py
    ```
-2. On the **"⭐ 1-Click Professor Demo"** tab:
-   * Click **`🧠 Brain MRI`** (or **`🫁 Chest X-Ray`**).
-   * Click **`▶ RUN FULL DEMO (Embed & Lossless Extract)`**.
+2. On the **"1-Click Professor Demo"** tab:
+   * Click **`Brain MRI`** (or **`Chest X-Ray`**).
+   * Click **`RUN FULL DEMO (Embed & Lossless Extract)`**.
 3. Point out the 3 key results:
-   * **Side-by-side view:** Original vs Stego vs Restored scan ($\text{PSNR} > 50\text{ dB}$, $\text{SSIM} > 0.999$).
-   * **Green Proof Banner:** `✓ 100% LOSSLESS RECOVERY CONFIRMED: MSE = 0.000000 | Restored PSNR = ∞`.
+   * **Side-by-side view:** Original vs Stego vs Restored scan (PSNR > 50 dB, SSIM > 0.999).
+   * **Verification Banner:** `100% LOSSLESS RECOVERY CONFIRMED: MSE = 0.000000 | Restored PSNR = infinity`.
    * **Extracted Record:** Shows the exact confidential medical record restored without error.
-4. *(Optional)* Switch to the **`📊 Histogram Analysis`** tab to show the green Peak bin and red Zero bin shift.
+4. *(Optional)* Switch to the **`Histogram Analysis`** tab to show the green Peak bin and red Zero bin shift.
 
 ---
 

@@ -100,10 +100,10 @@ class RDHApp:
         self.tab_extract = tk.Frame(tab_control, bg=self.c_bg, padx=15, pady=10)
         self.tab_hist = tk.Frame(tab_control, bg=self.c_bg, padx=15, pady=10)
 
-        tab_control.add(self.tab_live, text="  ⭐ 1-Click Professor Demo  ")
+        tab_control.add(self.tab_live, text="  1-Click Demonstration  ")
         tab_control.add(self.tab_embed, text="  Step 1: Embed to /encoded  ")
         tab_control.add(self.tab_extract, text="  Step 2: Extract & Restore  ")
-        tab_control.add(self.tab_hist, text="  📊 Histogram Analysis  ")
+        tab_control.add(self.tab_hist, text="  Histogram Analysis  ")
         
         tab_control.pack(expand=True, fill=tk.BOTH)
 
@@ -122,16 +122,16 @@ class RDHApp:
 
         tk.Label(preset_frame, text="Select Medical Scan:", bg=self.c_card, font=("Helvetica", 10)).pack(side=tk.LEFT, padx=(0, 8))
 
-        btn_brain = tk.Button(preset_frame, text="🧠 Brain MRI", bg="#E0E7FF", fg="#3730A3", font=("Helvetica", 9, "bold"), command=lambda: self._load_preset("brain_mri.png", "CONFIDENTIAL: Patient #89021 - MRI Normal. No acute intracranial hemorrhage."))
+        btn_brain = tk.Button(preset_frame, text="Brain MRI", bg="#E0E7FF", fg="#3730A3", font=("Helvetica", 9, "bold"), command=lambda: self._load_preset("brain_mri.png", "CONFIDENTIAL: Patient #89021 - MRI Normal. No acute intracranial hemorrhage."))
         btn_brain.pack(side=tk.LEFT, padx=4)
 
-        btn_chest = tk.Button(preset_frame, text="🫁 Chest X-Ray", bg="#E0E7FF", fg="#3730A3", font=("Helvetica", 9, "bold"), command=lambda: self._load_preset("chest_xray.png", "DIAGNOSIS: Clear bilateral lung fields. Cardiothoracic ratio within normal limits."))
+        btn_chest = tk.Button(preset_frame, text="Chest X-Ray", bg="#E0E7FF", fg="#3730A3", font=("Helvetica", 9, "bold"), command=lambda: self._load_preset("chest_xray.png", "DIAGNOSIS: Clear bilateral lung fields. Cardiothoracic ratio within normal limits."))
         btn_chest.pack(side=tk.LEFT, padx=4)
 
-        btn_knee = tk.Button(preset_frame, text="🦵 Knee Joint", bg="#E0E7FF", fg="#3730A3", font=("Helvetica", 9, "bold"), command=lambda: self._load_preset("knee_scan.png", "SURGICAL NOTE: Femur and tibia alignment normal. Joint space preserved."))
+        btn_knee = tk.Button(preset_frame, text="Knee Joint", bg="#E0E7FF", fg="#3730A3", font=("Helvetica", 9, "bold"), command=lambda: self._load_preset("knee_scan.png", "SURGICAL NOTE: Femur and tibia alignment normal. Joint space preserved."))
         btn_knee.pack(side=tk.LEFT, padx=4)
 
-        btn_custom = tk.Button(preset_frame, text="📂 Browse Custom Image...", bg="#F1F5F9", font=("Helvetica", 9), command=self._browse_custom_demo)
+        btn_custom = tk.Button(preset_frame, text="Browse Custom Image...", bg="#F1F5F9", font=("Helvetica", 9), command=self._browse_custom_demo)
         btn_custom.pack(side=tk.LEFT, padx=8)
 
         # Message input row
@@ -145,7 +145,7 @@ class RDHApp:
 
         btn_run = tk.Button(
             msg_frame,
-            text=" ▶ RUN FULL DEMO (Embed & Lossless Extract) ",
+            text=" RUN FULL DEMO (Embed & Lossless Extract) ",
             bg="#10B981",
             fg="white",
             font=("Helvetica", 10, "bold"),
@@ -192,7 +192,7 @@ class RDHApp:
 
         self.lbl_banner_status = tk.Label(
             self.banner_frame,
-            text="⚡ Status: Ready. Click any preset above and click 'RUN FULL DEMO' to demonstrate.",
+            text="Status: Ready. Click any preset above and click 'RUN FULL DEMO' to demonstrate.",
             font=("Helvetica", 11, "bold"),
             bg="#F1F5F9",
             fg="#334155"
@@ -287,7 +287,7 @@ class RDHApp:
             if results["exact_match"] and text_matches:
                 self.banner_frame.config(bg="#DCFCE7") # Light green
                 self.lbl_banner_status.config(
-                    text="✓ 100% LOSSLESS RECOVERY CONFIRMED:  MSE = 0.000000  |  Restored PSNR = ∞  |  Bit-for-bit Exact Match!",
+                    text="100% LOSSLESS RECOVERY CONFIRMED:  MSE = 0.000000  |  Restored PSNR = infinity  |  Bit-for-bit Exact Match!",
                     fg="#166534",
                     bg="#DCFCE7"
                 )
@@ -298,7 +298,7 @@ class RDHApp:
                 )
             else:
                 self.banner_frame.config(bg="#FEE2E2")
-                self.lbl_banner_status.config(text="❌ Verification mismatch detected.", fg="#991B1B", bg="#FEE2E2")
+                self.lbl_banner_status.config(text="Verification mismatch detected.", fg="#991B1B", bg="#FEE2E2")
 
             # Update Histogram Tab
             self._plot_histograms(self.current_cover_img, stego, meta)
@@ -357,7 +357,7 @@ class RDHApp:
         row4.pack(fill=tk.X, pady=15)
         btn_embed = tk.Button(
             row4,
-            text=" 🔒 Embed and Save Stego Image to /encoded ",
+            text=" Embed and Save Stego Image to /encoded ",
             bg=self.c_primary,
             fg="white",
             font=("Helvetica", 11, "bold"),
@@ -403,11 +403,11 @@ class RDHApp:
             saved_png, saved_json = save_stego_object(stego, meta, out_file)
 
             msg = (
-                f"✓ Successfully embedded {len(bits)} bits into stego image!\n"
-                f"• Saved Stego Image: {saved_png}\n"
-                f"• Saved Metadata: {saved_json}\n"
-                f"• Peak Bin P: {meta['peak_bin']} | Zero Bin Z: {meta['zero_bin']}\n"
-                f"• Stego Image Fidelity: PSNR = {psnr:.2f} dB | SSIM = {ssim:.5f}"
+                f"Successfully embedded {len(bits)} bits into stego image!\n"
+                f"- Saved Stego Image: {saved_png}\n"
+                f"- Saved Metadata: {saved_json}\n"
+                f"- Peak Bin P: {meta['peak_bin']} | Zero Bin Z: {meta['zero_bin']}\n"
+                f"- Stego Image Fidelity: PSNR = {psnr:.2f} dB | SSIM = {ssim:.5f}"
             )
             self.embed_results_var.set(msg)
             messagebox.showinfo("Success", f"Stego image successfully generated and saved to:\n{saved_png}")
@@ -441,7 +441,7 @@ class RDHApp:
         row3.pack(fill=tk.X, pady=15)
         btn_extract = tk.Button(
             row3,
-            text=" 🔓 Extract Secret & Losslessly Restore Image ",
+            text=" Extract Secret & Losslessly Restore Image ",
             bg=self.c_success,
             fg="white",
             font=("Helvetica", 11, "bold"),
@@ -493,19 +493,19 @@ class RDHApp:
                 res = verify_losslessness(orig_img, restored_img)
                 if res["exact_match"]:
                     verification_note = (
-                        f"\n✓ REVERSIBILITY VERIFIED AGAINST ORIGINAL:\n"
-                        f"• Exact Match: True (Bit-for-bit identical)\n"
-                        f"• Mean Squared Error (MSE): 0.000000\n"
-                        f"• Restored PSNR: INFINITY (Lossless Recovery)"
+                        f"\nREVERSIBILITY VERIFIED AGAINST ORIGINAL:\n"
+                        f"- Exact Match: True (Bit-for-bit identical)\n"
+                        f"- Mean Squared Error (MSE): 0.000000\n"
+                        f"- Restored PSNR: INFINITY (Lossless Recovery)"
                     )
                 else:
                     verification_note = f"\nMSE mismatch: {res['mse']}"
 
             status = (
-                f"✓ Extraction complete!\n"
-                f"• Total Bits Extracted: {len(extracted_bits)}\n"
-                f"• Decryption Status: Successful\n"
-                f"• Peak Bin Reversed: {meta['peak_bin']} | Direction: {meta['direction']}"
+                f"Extraction complete!\n"
+                f"- Total Bits Extracted: {len(extracted_bits)}\n"
+                f"- Decryption Status: Successful\n"
+                f"- Peak Bin Reversed: {meta['peak_bin']} | Direction: {meta['direction']}"
                 f"{verification_note}"
             )
             self.extract_results_var.set(status)
