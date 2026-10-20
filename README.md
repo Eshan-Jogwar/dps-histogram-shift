@@ -47,7 +47,8 @@ When presenting to your professor, follow these 3 effortless steps on the **"⭐
      > `✓ 100% LOSSLESS RECOVERY CONFIRMED: MSE = 0.000000 | Restored PSNR = ∞`
    * **Extracted Record:** Show that the extracted patient record matches the original text bit-for-bit.
    * **Stored Output:** Point out that the stego image is automatically saved in [`encoded/`](encoded/).
-   * *(Bonus if asked how it works)*: Switch to the **`📊 Histogram Analysis`** tab to show the green **Peak Bin ($P$)** and red **Zero Bin ($Z$)** and explain that intermediate pixels are shifted by $+1$ to make room for the secret data, and shifted back by $-1$ on recovery.
+* *(Bonus if asked how it works)*: Switch to the **`📊 Histogram Analysis`** tab to show the green **Peak Bin ($P$)** and red **Zero Bin ($Z$)** and explain that intermediate pixels are shifted by $+1$ to make room for the secret data, and shifted back by $-1$ on recovery.
+   * *(Full plain-English explanation with diagrams)*: See [HOW_IT_WORKS.md](HOW_IT_WORKS.md).
 
 ---
 
@@ -65,6 +66,9 @@ dps/
 ├── encoded/                 # Destination folder storing stego objects (.png) & metadata (.json)
 ├── run_gui.py               # Main launcher script for the Tkinter desktop app
 ├── test_rdh.py              # Automated test suite proving 100% losslessness
+├── HOW_IT_WORKS.md          # Plain-English explanation of algorithm & encryption with graphs
+├── HOW_TO_RUN.md            # Complete multi-platform setup guide
+├── requirements.txt         # Project dependencies
 ├── synopsis.tex             # 1-page LaTeX synopsis source
 └── synopsis.pdf             # Compiled 1-page PDF synopsis
 ```
