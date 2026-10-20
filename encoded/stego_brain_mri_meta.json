@@ -3,8 +3,8 @@
     "peak_bin": 8,
     "zero_bin": 154,
     "direction": "up",
-    "embedded_bits": 712,
-    "total_bits_with_header": 744,
+    "embedded_bits": 208,
+    "total_bits_with_header": 240,
     "pixels_shifted": 154736,
     "image_shape": [
         512,
