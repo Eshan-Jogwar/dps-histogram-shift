@@ -344,13 +344,8 @@ class RDHApp:
         self.embed_text_box.insert("1.0", "Patient ID: #449102\nDiagnosis: Normal pulmonary parenchyma. No consolidation or effusion.")
         self.embed_text_box.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5)
 
-        # Optional Password
-        row3 = tk.Frame(frame, bg=self.c_bg)
-        row3.pack(fill=tk.X, pady=8)
-        tk.Label(row3, text="Optional Password:", font=("Helvetica", 10, "bold"), bg=self.c_bg, width=15, anchor="w").pack(side=tk.LEFT)
+        # Password variable kept internally (empty default)
         self.embed_pass_var = tk.StringVar(value="")
-        tk.Entry(row3, textvariable=self.embed_pass_var, show="*", font=("Helvetica", 10), width=30).pack(side=tk.LEFT, padx=5)
-        tk.Label(row3, text="(Leaves plaintext if empty, or uses AES-GCM if set)", font=("Helvetica", 9), fg="#64748B", bg=self.c_bg).pack(side=tk.LEFT)
 
         # Embed Action Button
         row4 = tk.Frame(frame, bg=self.c_bg)
@@ -429,12 +424,8 @@ class RDHApp:
         tk.Entry(row1, textvariable=self.extract_path_var, font=("Helvetica", 10), width=60).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         tk.Button(row1, text="Browse from /encoded...", command=self._browse_extract_image).pack(side=tk.LEFT)
 
-        # Password
-        row2 = tk.Frame(frame, bg=self.c_bg)
-        row2.pack(fill=tk.X, pady=8)
-        tk.Label(row2, text="Password (if set):", font=("Helvetica", 10, "bold"), bg=self.c_bg, width=15, anchor="w").pack(side=tk.LEFT)
+        # Password variable kept internally (empty default)
         self.extract_pass_var = tk.StringVar(value="")
-        tk.Entry(row2, textvariable=self.extract_pass_var, show="*", font=("Helvetica", 10), width=30).pack(side=tk.LEFT, padx=5)
 
         # Extract Button
         row3 = tk.Frame(frame, bg=self.c_bg)
