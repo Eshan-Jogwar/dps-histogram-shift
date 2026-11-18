@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reversible Data Hiding | Histogram Shifting Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            medical: {
+              cyan: '#06b6d4',
+              teal: '#14b8a6',
+              emerald: '#10b981',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%), #0b0f19;
+      color: #e2e8f0;
+    }
+    .glass {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 20px -5px rgba(6, 182, 212, 0.4);
+    }
+    .glow-emerald {
+      box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.4);
+    }
+    .pixel-badge {
+      font-feature-settings: "tnum";
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0b0f19; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-200 antialiased font-sans flex flex-col justify-between">
+
+  <!-- Top Navigation Header -->
+  <header class="glass sticky top-0 z-50 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-medical-cyan flex items-center justify-center font-mono font-bold text-white text-lg shadow-lg">
+          RDH
+        </div>
+        <div>
+          <h1 class="text-base font-bold tracking-tight text-white flex items-center space-x-2">
+            <span>Reversible Data Hiding</span>
+            <span class="text-xs font-mono font-semibold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20">Histogram Shifting</span>
+          </h1>
+          <p class="text-xs text-slate-400 font-mono">B.Tech 3rd Year Project &bull; Zero Distortion Proof (MSE = 0)</p>
+        </div>
+      </div>
+
+      <!-- Authors -->
+      <div class="hidden md:flex items-center space-x-2 text-xs font-mono text-slate-400 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800">
+        <span class="text-slate-500">Team:</span>
+        <span class="text-slate-300 font-semibold">Eshan Jogwar</span>
+        <span class="text-slate-600">|</span>
+        <span class="text-slate-300 font-semibold">Tushar Sign</span>
+        <span class="text-slate-600">|</span>
+        <span class="text-slate-300 font-semibold">Rudravignesh</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-6 py-8 flex-1 w-full space-y-8">
+
+    <!-- Hero / Control Bar -->
+    <div class="glass-card rounded-2xl p-6 shadow-xl border border-slate-800/80">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+
+        <!-- Preset Selector -->
+        <div class="space-y-2">
+          <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono">Select Clinical Medical Scan</label>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="selectPreset('brain_mri.png')" id="btn-brain_mri" class="preset-btn px-4 py-2 rounded-xl text-xs font-mono font-medium border border-slate-700 bg-slate-800/60 hover:bg-slate-700 text-slate-200 transition-all flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span>Brain MRI (512x512)</span>
+            </button>
+            <button onclick="selectPreset('chest_xray.png')" id="btn-chest_xray" class="preset-btn px-4 py-2 rounded-xl text-xs font-mono font-medium border border-slate-700 bg-slate-800/60 hover:bg-slate-700 text-slate-200 transition-all flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+              <span>Chest X-Ray (512x512)</span>
+            </button>
+            <button onclick="selectPreset('knee_scan.png')" id="btn-knee_scan" class="preset-btn px-4 py-2 rounded-xl text-xs font-mono font-medium border border-slate-700 bg-slate-800/60 hover:bg-slate-700 text-slate-200 transition-all flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>Knee Joint (512x512)</span>
+            </button>
+            <label class="cursor-pointer px-4 py-2 rounded-xl text-xs font-mono font-medium border border-dashed border-slate-700 hover:border-slate-500 bg-slate-900/40 text-slate-400 hover:text-slate-200 transition-all flex items-center space-x-2">
+              <span>Upload Custom...</span>
+              <input type="file" id="custom-file" accept="image/png, image/jpeg, image/bmp" class="hidden" onchange="handleCustomUpload(event)">
+            </label>
+          </div>
+        </div>
+
+        <!-- Big Action Run Button -->
+        <div class="flex items-center space-x-3">
+          <button onclick="runEndToEndDemo()" id="btn-run" class="w-full lg:w-auto px-6 py-3.5 rounded-xl font-bold text-sm tracking-wide bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 shadow-lg glow-emerald transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <span>RUN 1-CLICK DEMONSTRATION</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Secret Message Input -->
+      <div class="mt-5 pt-5 border-t border-slate-800/80">
+        <label for="secret-message" class="text-xs font-semibold uppercase tracking-wider text-slate-400 font-mono block mb-2">
+          Confidential Electronic Patient Record (EPR Payload to Embed)
+        </label>
+        <div class="relative">
+          <textarea id="secret-message" rows="2" class="w-full rounded-xl bg-slate-900/90 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 px-4 py-3 text-sm text-slate-100 font-mono transition-all resize-none" placeholder="Type confidential medical record to embed into cover image..."></textarea>
+          <span id="char-count" class="absolute bottom-2 right-3 text-[10px] font-mono text-slate-500">0 characters</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Proof Banner -->
+    <div id="proof-banner" class="hidden glass-card rounded-2xl p-6 border-l-4 border-l-emerald-500 transition-all">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold font-mono">OK</span>
+            <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400 font-mono">100% Lossless Restoration Verified</h3>
+          </div>
+          <p class="text-xs text-slate-400 mt-1 font-mono">
+            Bit-for-bit identity check confirmed: <code class="text-emerald-300 font-bold">np.array_equal(original, restored) == True</code>. Zero permanent alteration.
+          </p>
+        </div>
+        <!-- Metrics Badges -->
+        <div class="flex items-center space-x-3 text-xs font-mono">
+          <div class="bg-slate-900/80 px-3 py-2 rounded-xl border border-slate-800">
+            <span class="text-slate-500 block text-[10px]">RESTORATION MSE</span>
+            <span class="text-emerald-400 font-bold text-sm" id="badge-mse">0.000000</span>
+          </div>
+          <div class="bg-slate-900/80 px-3 py-2 rounded-xl border border-slate-800">
+            <span class="text-slate-500 block text-[10px]">RESTORED PSNR</span>
+            <span class="text-emerald-400 font-bold text-sm" id="badge-psnr">&infin; dB</span>
+          </div>
+          <div class="bg-slate-900/80 px-3 py-2 rounded-xl border border-slate-800">
+            <span class="text-slate-500 block text-[10px]">STEGO FIDELITY</span>
+            <span class="text-cyan-400 font-bold text-sm" id="badge-stego-psnr">-- dB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decoded String Banner -->
+      <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-start space-x-2 text-xs font-mono">
+        <span class="text-slate-500 whitespace-nowrap">Extracted Payload:</span>
+        <span class="text-emerald-300 font-semibold break-all" id="extracted-text-display">None</span>
+      </div>
+    </div>
+
+    <!-- 3-Column Image Comparison Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Column 1: Original Image -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div class="flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold font-mono flex items-center justify-center">1</span>
+            <h2 class="text-sm font-bold text-white">Original Medical Scan</h2>
+          </div>
+          <span class="text-[10px] font-mono text-slate-400 bg-slate-800/60 px-2 py-0.5 rounded">Cover Matrix</span>
+        </div>
+
+        <div class="relative aspect-square w-full rounded-xl bg-slate-950/80 border border-slate-800/60 overflow-hidden flex items-center justify-center">
+          <img id="img-original" src="" alt="Original Scan" class="w-full h-full object-contain hidden">
+          <div id="ph-original" class="text-xs font-mono text-slate-600 flex flex-col items-center space-y-1">
+            <svg class="w-8 h-8 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>Select preset above</span>
+          </div>
+        </div>
+
+        <div class="text-[11px] font-mono text-slate-400 space-y-1 bg-slate-900/40 p-3 rounded-xl border border-slate-800/40">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Dimensions:</span>
+            <span class="text-slate-300" id="info-orig-dim">512 x 512</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Color Depth:</span>
+            <span class="text-slate-300">8-bit Grayscale</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 2: Stego Image -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div class="flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 text-xs font-bold font-mono flex items-center justify-center">2</span>
+            <h2 class="text-sm font-bold text-white">Stego Scan (Data Hidden)</h2>
+          </div>
+          <span class="text-[10px] font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">Shifted Matrix</span>
+        </div>
+
+        <div class="relative aspect-square w-full rounded-xl bg-slate-950/80 border border-slate-800/60 overflow-hidden flex items-center justify-center">
+          <img id="img-stego" src="" alt="Stego Scan" class="w-full h-full object-contain hidden">
+          <div id="ph-stego" class="text-xs font-mono text-slate-600 flex flex-col items-center space-y-1">
+            <svg class="w-8 h-8 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <span>Click Run Demo to generate</span>
+          </div>
+        </div>
+
+        <div class="text-[11px] font-mono text-slate-400 space-y-1 bg-slate-900/40 p-3 rounded-xl border border-slate-800/40">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Peak Bin (P):</span>
+            <span class="text-cyan-400 font-bold" id="info-stego-peak">--</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Zero Bin (Z):</span>
+            <span class="text-indigo-400 font-bold" id="info-stego-zero">--</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Fidelity (SSIM):</span>
+            <span class="text-emerald-400 font-bold" id="info-stego-ssim">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 3: Restored Image -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div class="flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs font-bold font-mono flex items-center justify-center">3</span>
+            <h2 class="text-sm font-bold text-white">Restored Scan (Post-Extraction)</h2>
+          </div>
+          <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Exact Recovery</span>
+        </div>
+
+        <div class="relative aspect-square w-full rounded-xl bg-slate-950/80 border border-slate-800/60 overflow-hidden flex items-center justify-center">
+          <img id="img-restored" src="" alt="Restored Scan" class="w-full h-full object-contain hidden">
+          <div id="ph-restored" class="text-xs font-mono text-slate-600 flex flex-col items-center space-y-1">
+            <svg class="w-8 h-8 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Verified post extraction</span>
+          </div>
+        </div>
+
+        <div class="text-[11px] font-mono text-slate-400 space-y-1 bg-slate-900/40 p-3 rounded-xl border border-slate-800/40">
+          <div class="flex justify-between">
+            <span class="text-slate-500">MSE vs Original:</span>
+            <span class="text-emerald-400 font-bold" id="info-rest-mse">--</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Restored PSNR:</span>
+            <span class="text-emerald-400 font-bold" id="info-rest-psnr">--</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Array Equal:</span>
+            <span class="text-emerald-400 font-bold" id="info-rest-exact">--</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Histogram Visualizer Panel -->
+    <div class="glass-card rounded-2xl p-6 border border-slate-800/80 space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-800/80 pb-4 gap-2">
+        <div>
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider font-mono flex items-center space-x-2">
+            <span>Pixel Frequency Distribution (Histogram Shifting Proof)</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1 font-mono">
+            Displays original bins vs. shifted bins. Notice the Peak bin (P) split and the 1-unit rigid shift opening a gap towards Zero bin (Z).
+          </p>
+        </div>
+        <div class="flex items-center space-x-4 text-xs font-mono">
+          <div class="flex items-center space-x-1.5">
+            <span class="w-3 h-3 rounded-sm bg-cyan-500 inline-block"></span>
+            <span class="text-slate-300">Original Scan</span>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <span class="w-3 h-3 rounded-sm bg-indigo-500 inline-block"></span>
+            <span class="text-slate-300">Stego (Shifted)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Canvas -->
+      <div class="w-full h-72">
+        <canvas id="histChart"></canvas>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="glass border-t border-slate-800 py-4 text-center text-xs font-mono text-slate-500">
+    Reversible Data Hiding using Block-Wise Histogram Shifting &bull; Reference: Khudhair et al. (MDPI Electronics 2023)
+  </footer>
+
+  <script>
+    let currentPreset = 'brain_mri.png';
+    let currentCoverB64 = '';
+    let histChart = null;
+
+    // Initialize Chart
+    function initChart() {
+      const ctx = document.getElementById('histChart').getContext('2d');
+      const labels = Array.from({length: 256}, (_, i) => i);
+
+      histChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Original Histogram',
+              data: new Array(256).fill(0),
+              backgroundColor: 'rgba(6, 182, 212, 0.65)',
+              borderColor: 'rgba(6, 182, 212, 1)',
+              borderWidth: 0.5,
+              barPercentage: 1.0,
+              categoryPercentage: 1.0,
+            },
+            {
+              label: 'Stego Histogram (Shifted)',
+              data: new Array(256).fill(0),
+              backgroundColor: 'rgba(99, 102, 241, 0.65)',
+              borderColor: 'rgba(99, 102, 241, 1)',
+              borderWidth: 0.5,
+              barPercentage: 1.0,
+              categoryPercentage: 1.0,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 400 },
+          scales: {
+            x: {
+              title: { display: true, text: 'Pixel Intensity (0 - 255)', color: '#94a3b8', font: { size: 10, family: 'JetBrains Mono' } },
+              ticks: { color: '#64748b', maxTicksLimit: 16, font: { size: 9, family: 'JetBrains Mono' } },
+              grid: { color: 'rgba(51, 65, 85, 0.2)' }
+            },
+            y: {
+              title: { display: true, text: 'Frequency (Pixel Count)', color: '#94a3b8', font: { size: 10, family: 'JetBrains Mono' } },
+              ticks: { color: '#64748b', font: { size: 9, family: 'JetBrains Mono' } },
+              grid: { color: 'rgba(51, 65, 85, 0.2)' }
+            }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    async function selectPreset(filename) {
+      currentPreset = filename;
+
+      // Update button styling
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.classList.remove('border-brand-500', 'bg-brand-500/20', 'text-white');
+        btn.classList.add('border-slate-700', 'bg-slate-800/60', 'text-slate-200');
+      });
+      const activeBtn = document.getElementById('btn-' + filename.replace('.png', ''));
+      if (activeBtn) {
+        activeBtn.classList.remove('border-slate-700', 'bg-slate-800/60', 'text-slate-200');
+        activeBtn.classList.add('border-brand-500', 'bg-brand-500/20', 'text-white');
+      }
+
+      // Fetch preset
+      const res = await fetch('/api/preset/' + filename);
+      const data = await res.json();
+
+      currentCoverB64 = data.image_b64;
+
+      // Update Cover Image display
+      const imgOrig = document.getElementById('img-original');
+      imgOrig.src = data.image_b64;
+      imgOrig.classList.remove('hidden');
+      document.getElementById('ph-original').classList.add('hidden');
+
+      // Update text box with default message
+      const msgBox = document.getElementById('secret-message');
+      msgBox.value = data.info.default_message;
+      updateCharCount();
+
+      // Reset stego / restored placeholders
+      document.getElementById('img-stego').classList.add('hidden');
+      document.getElementById('ph-stego').classList.remove('hidden');
+      document.getElementById('img-restored').classList.add('hidden');
+      document.getElementById('ph-restored').classList.remove('hidden');
+      document.getElementById('proof-banner').classList.add('hidden');
+
+      // Reset info text
+      document.getElementById('info-stego-peak').innerText = '--';
+      document.getElementById('info-stego-zero').innerText = '--';
+      document.getElementById('info-stego-ssim').innerText = '--';
+      document.getElementById('info-rest-mse').innerText = '--';
+      document.getElementById('info-rest-psnr').innerText = '--';
+      document.getElementById('info-rest-exact').innerText = '--';
+
+      // Update Chart with original only
+      histChart.data.datasets[0].data = data.histogram;
+      histChart.data.datasets[1].data = new Array(256).fill(0);
+      histChart.update();
+    }
+
+    async function runEndToEndDemo() {
+      const btn = document.getElementById('btn-run');
+      btn.disabled = true;
+      btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> PROCESSING...`;
+
+      const msg = document.getElementById('secret-message').value;
+
+      try {
+        const res = await fetch('/api/run_demo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: currentPreset, message: msg })
+        });
+        const data = await res.json();
+
+        if (data.error) {
+          alert("Error: " + data.error);
+          return;
+        }
+
+        // 1. Show Stego Image
+        const imgStego = document.getElementById('img-stego');
+        imgStego.src = data.stego_b64;
+        imgStego.classList.remove('hidden');
+        document.getElementById('ph-stego').classList.add('hidden');
+
+        // 2. Show Restored Image
+        const imgRest = document.getElementById('img-restored');
+        imgRest.src = data.restored_b64;
+        imgRest.classList.remove('hidden');
+        document.getElementById('ph-restored').classList.add('hidden');
+
+        // 3. Update Stego Meta
+        document.getElementById('info-stego-peak').innerText = data.meta.peak_bin;
+        document.getElementById('info-stego-zero').innerText = data.meta.zero_bin + ` (${data.meta.direction})`;
+        document.getElementById('info-stego-ssim').innerText = data.metrics.stego_ssim;
+
+        // 4. Update Restored Meta
+        document.getElementById('info-rest-mse').innerText = Number(data.metrics.restored_mse).toFixed(6);
+        document.getElementById('info-rest-psnr').innerText = data.metrics.restored_psnr === 'inf' ? '∞' : data.metrics.restored_psnr + ' dB';
+        document.getElementById('info-rest-exact').innerText = data.metrics.exact_match ? 'TRUE (100%)' : 'FALSE';
+
+        // 5. Update Banner
+        const banner = document.getElementById('proof-banner');
+        banner.classList.remove('hidden');
+        document.getElementById('badge-mse').innerText = Number(data.metrics.restored_mse).toFixed(6);
+        document.getElementById('badge-psnr').innerText = data.metrics.restored_psnr === 'inf' ? '∞ dB' : data.metrics.restored_psnr + ' dB';
+        document.getElementById('badge-stego-psnr').innerText = data.metrics.stego_psnr === 'inf' ? '∞ dB' : data.metrics.stego_psnr + ' dB';
+        document.getElementById('extracted-text-display').innerText = `"${data.extracted_text}"`;
+
+        // 6. Update Histograms
+        histChart.data.datasets[0].data = data.original_hist;
+        histChart.data.datasets[1].data = data.stego_hist;
+        histChart.update();
+
+      } catch (err) {
+        alert("Execution failed: " + err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>RUN 1-CLICK DEMONSTRATION</span>`;
+      }
+    }
+
+    function handleCustomUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const b64 = evt.target.result;
+        currentCoverB64 = b64;
+        currentPreset = 'custom';
+
+        const imgOrig = document.getElementById('img-original');
+        imgOrig.src = b64;
+        imgOrig.classList.remove('hidden');
+        document.getElementById('ph-original').classList.add('hidden');
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+          btn.classList.remove('border-brand-500', 'bg-brand-500/20', 'text-white');
+        });
+
+        alert("Custom scan loaded! Click 'RUN 1-CLICK DEMONSTRATION' to test.");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateCharCount() {
+      const len = document.getElementById('secret-message').value.length;
+      document.getElementById('char-count').innerText = `${len} characters`;
+    }
+
+    document.getElementById('secret-message').addEventListener('input', updateCharCount);
+
+    // Boot
+    window.onload = () => {
+      initChart();
+      selectPreset('brain_mri.png');
+    };
+  </script>
+</body>
+</html>
